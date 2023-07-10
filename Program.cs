@@ -118,7 +118,7 @@ namespace Bank
             Console.Write("Enter amount to deposit: ");
             decimal amount = decimal.Parse(Console.ReadLine());
             currentClient.Amount += amount;
-            UpdateClientFile(currentClient);
+           // UpdateClientFile(currentClient);
 
 
             Console.WriteLine($"Your new balance is: {currentClient.Amount}");
@@ -131,7 +131,7 @@ namespace Bank
             if (currentClient.Amount >= amount)
             {
                 currentClient.Amount -= amount;
-                UpdateClientFile(currentClient);
+               // UpdateClientFile(currentClient);
                 Console.WriteLine($"Current balance: {currentClient.Amount}");
             }
             else
@@ -146,23 +146,23 @@ namespace Bank
             Console.Write("Enter the amount to transfer: ");
             decimal amount = Convert.ToDecimal(Console.ReadLine());
 
-            Client recipient = FindClientByIBAN(recipientIBAN);
-            if (recipient != null)
+            //Client recipient = FindClientByIBAN(recipientIBAN);
+           // if (recipient != null)
             {
-                if (currentClient.Amount >= amount)
+                //if (currentClient.Amount >= amount)
                 {
-                    currentClient.Amount -= amount;
-                    recipient.Amount += amount;
-                    UpdateClientFile(currentClient);
-                    UpdateClientFile(recipient);
-                    Console.WriteLine($" Current balance: {currentClient.Amount}");
+                   // currentClient.Amount -= amount;
+                  //  recipient.Amount += amount;
+                   // UpdateClientFile(currentClient);
+                   // UpdateClientFile(recipient);
+                 //   Console.WriteLine($" Current balance: {currentClient.Amount}");
                 }
-                else
+                //else
                 {
                     Console.WriteLine("Insufficient funds. Cannot transfer.");
                 }
             }
-            else
+           // else
             {
                 Console.WriteLine("Recipient with the specified IBAN not found.");
             }
@@ -173,7 +173,7 @@ namespace Bank
             string newPassword = Console.ReadLine();
 
             currentClient.Password = newPassword;
-            UpdateClientFile(currentClient);
+           // UpdateClientFile(currentClient);
 
             Console.WriteLine("Password changed successfully.");
         }
@@ -204,45 +204,11 @@ namespace Bank
                 }
             }
         }
-
-        static void UpdateClientFile(Client client)
-        {
-            string tempFile = Path.GetTempFileName();
-
-            using (StreamWriter writer = new StreamWriter(tempFile))
-            {
-                foreach (Client c in clients)
-                {
-                    if (c.ID == client.ID)
-                    {
-                        writer.WriteLine("{0},{1},{2},{3},{4},{5},{6}",
-                            c.ID, c.FirstName, c.LastName, c.Age, c.IBAN, c.Amount, client.Password);
-                    }
-                    else
-                    {
-                        writer.WriteLine("{0},{1},{2},{3},{4},{5},{6}",
-                            c.ID, c.FirstName, c.LastName, c.Age, c.IBAN, c.Amount, c.Password);
-                    }
-                }
-            }
-
-            File.Delete("clients.txt");
-            File.Move(tempFile, "clients.txt");
         }
 
-        static Client FindClientByIBAN(string iban)
-        {
-            foreach (Client client in clients)
-            {
-                if (client.IBAN == iban)
-                {
-                    return client;
-                }
-            }
-            return null;
-        }
+   
     }
-}
+
 
 
 
