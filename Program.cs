@@ -14,64 +14,235 @@ namespace Bank
         public int Age { get; set; }
         public string IBAN { get; set; }
         public decimal Amount { get; set; }
-        public string Pass { get; set; }
+        public string Password { get; set; }
     }
 
     class Program
     {
+        static List<Client> clients;
+        static Client currentClient;
+
         static void Main(string[] args)
         {
-            List<Client> clients = LoadClientsFromFile("clients.txt");
+            LoadClientsFromFile();
+            bool exit = false;
+            while (!exit)
+            {
+                Console.WriteLine("Welcome to the Banking System");
+                Console.WriteLine("-------------------------------");
+                Console.WriteLine("1. Log in");
+                Console.WriteLine("2. Exit");
+                Console.Write("Enter your choice: ");
+                string choice = Console.ReadLine();
 
+                switch (choice)
+                {
+                    case "1":
+                        LogIn();
+                        break;
+                    case "2":
+                        exit = true;
+                        break;
+                    default:
+                        Console.WriteLine("Invalid choice. Please try again.");
+                        break;
+                }
+
+                Console.WriteLine();
+            }
+        }
+        static void LogIn()
+        {
             Console.Write("Enter your ID: ");
             int id = int.Parse(Console.ReadLine());
 
             Console.Write("Enter your password: ");
             string password = Console.ReadLine();
 
-            Client client = clients.FirstOrDefault(c => c.ID == id && c.Pass == password);
-
-            if (client == null)
+            foreach (Client client in clients)
             {
-                Console.WriteLine("Invalid ID or password.");
-                return;
+                if (client.ID == id && client.Password == password)
+                {
+                    currentClient = client;
+                    ShowMainMenu();
+                    return;
+                }
             }
-            Console.WriteLine($"Welcome, {client.FirstName}!");
 
-            while (true)
+            Console.WriteLine("Invalid ID or password. Please try again.");
+
+        }
+        static void ShowMainMenu()
+        {
+            bool logout = false;
+            while (!logout)
             {
-                Console.Write("Enter amount to deposit: ");
-                decimal amount = decimal.Parse(Console.ReadLine());
+                Console.WriteLine();
+                Console.WriteLine("Main Menu");
+                Console.WriteLine("-----------------------------");
+                Console.WriteLine("1. Deposit money");
+                Console.WriteLine("2. Withdraw money");
+                Console.WriteLine("3. Transfer money");
+                Console.WriteLine("4. Change password");
+                Console.WriteLine("5. Log out");
+                Console.Write("Enter your choice: ");
+                string choice = Console.ReadLine();
 
-                client.Amount += amount;
-
-                Console.WriteLine($"Your new balance is: {client.Amount}");
+                switch (choice)
+                {
+                    case "1":
+                        DepositMoney();
+                        break;
+                    case "2":
+                        WithdrawMoney();
+                        break;
+                    case "3":
+                        TransferMoney();
+                        break;
+                    case "4":
+                        ChangePassword();
+                        break;
+                    case "5":
+                        logout = true;
+                        currentClient = null;
+                        break;
+                    default:
+                        Console.WriteLine("Invalid choice. Please try again.");
+                        break;
+                }
             }
         }
-        static List<Client> LoadClientsFromFile(string filename)
+
+        static void DepositMoney()
         {
-            var clients = new List<Client>();
+            Console.Write("Enter amount to deposit: ");
+            decimal amount = decimal.Parse(Console.ReadLine());
+            currentClient.Amount += amount;
+            UpdateClientFile(currentClient);
 
-            foreach (string line in File.ReadLines(filename))
+
+            Console.WriteLine($"Your new balance is: {currentClient.Amount}");
+        }
+        static void WithdrawMoney()
+        {
+            Console.Write("Enter the amount to withdraw: ");
+            decimal amount = Convert.ToDecimal(Console.ReadLine());
+
+            if (currentClient.Amount >= amount)
             {
-                string[] parts = line.Split(',');
-
-                clients.Add(new Client()
-                {
-                    ID = int.Parse(parts[0]),
-                    FirstName = parts[1],
-                    LastName = parts[2],
-                    Age = int.Parse(parts[3]),
-                    IBAN = parts[4],
-                    Amount = decimal.Parse(parts[5]),
-                    Pass = parts[6]
-                });
+                currentClient.Amount -= amount;
+                UpdateClientFile(currentClient);
+                Console.WriteLine($"Current balance: {currentClient.Amount}");
             }
-            return clients;
+            else
+            {
+                Console.WriteLine("Insufficient funds. Cannot withdraw.");
+            }
+        }
+        static void TransferMoney()
+        {
+            Console.Write("Enter the recipient's IBAN: ");
+            string recipientIBAN = Console.ReadLine();
+            Console.Write("Enter the amount to transfer: ");
+            decimal amount = Convert.ToDecimal(Console.ReadLine());
+
+            Client recipient = FindClientByIBAN(recipientIBAN);
+            if (recipient != null)
+            {
+                if (currentClient.Amount >= amount)
+                {
+                    currentClient.Amount -= amount;
+                    recipient.Amount += amount;
+                    UpdateClientFile(currentClient);
+                    UpdateClientFile(recipient);
+                    Console.WriteLine($" Current balance: {currentClient.Amount}");
+                }
+                else
+                {
+                    Console.WriteLine("Insufficient funds. Cannot transfer.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Recipient with the specified IBAN not found.");
+            }
+        }
+        static void ChangePassword()
+        {
+            Console.Write("Enter your new password: ");
+            string newPassword = Console.ReadLine();
+
+            currentClient.Password = newPassword;
+            UpdateClientFile(currentClient);
+
+            Console.WriteLine("Password changed successfully.");
+        }
+
+        static void LoadClientsFromFile()
+        {
+            clients = new List<Client>();
+
+            using (StreamReader reader = new StreamReader("clients.txt"))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    string[] clientData = line.Split(',');
+
+                    Client client = new Client()
+                    {
+                        ID = int.Parse(clientData[0]),
+                        FirstName = clientData[1],
+                        LastName = clientData[2],
+                        Age = int.Parse(clientData[3]),
+                        IBAN = clientData[4],
+                        Amount = decimal.Parse(clientData[5]),
+                        Password = clientData[6]
+                    };
+
+                    clients.Add(client);
+                }
+            }
+        }
+
+        static void UpdateClientFile(Client client)
+        {
+            string tempFile = Path.GetTempFileName();
+
+            using (StreamWriter writer = new StreamWriter(tempFile))
+            {
+                foreach (Client c in clients)
+                {
+                    if (c.ID == client.ID)
+                    {
+                        writer.WriteLine("{0},{1},{2},{3},{4},{5},{6}",
+                            c.ID, c.FirstName, c.LastName, c.Age, c.IBAN, c.Amount, client.Password);
+                    }
+                    else
+                    {
+                        writer.WriteLine("{0},{1},{2},{3},{4},{5},{6}",
+                            c.ID, c.FirstName, c.LastName, c.Age, c.IBAN, c.Amount, c.Password);
+                    }
+                }
+            }
+
+            File.Delete("clients.txt");
+            File.Move(tempFile, "clients.txt");
+        }
+
+        static Client FindClientByIBAN(string iban)
+        {
+            foreach (Client client in clients)
+            {
+                if (client.IBAN == iban)
+                {
+                    return client;
+                }
+            }
+            return null;
         }
     }
 }
-    
 
 
 
@@ -80,7 +251,10 @@ namespace Bank
 
 
 
-        
 
-    
+
+
+
+
+
 
