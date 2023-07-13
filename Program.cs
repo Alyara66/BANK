@@ -231,10 +231,18 @@ namespace Bank
         static Client FindClientByIBAN(string iban)
         {
             foreach (Client client in clients)
+            {
+                if(client.IBAN == iban)
+                {
+                    return client;
+                }
+            }
         }
+        return null;
+    }
 
    
-    }
+    
 
 
 
