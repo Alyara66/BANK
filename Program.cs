@@ -145,16 +145,16 @@ namespace Bank
             Console.Write("Enter the amount to transfer: ");
             decimal amount = Convert.ToDecimal(Console.ReadLine());
 
-            Customer recipient= FindCustomerByIBAN(recipientIBAN);
+            Client recipient= FindClientByIBAN(recipientIBAN);
             if (recipient != null)
             {
-                if (currentCustomer.Amount>=amount)
+                if (currentClient.Amount>=amount)
                 {
                     currentCustomer.Amount -= amount;
                     recipient.Amount += amount;
-                    UpdateCustomerFile(currentCustomer);
+                    UpdateCustomerFile(currentClient);
                     UpdateCustomerFile(recipient);
-                    Console.WriteLine("Transfer succesful. Current balance: {0}", currentCustomer.Amount);
+                    Console.WriteLine($" Current balance: {currentClient.Amount}");
                 }
                 else
                 {
@@ -237,10 +237,11 @@ namespace Bank
                     return client;
                 }
             }
+            return null;
         }
-        return null;
+        
     }
-
+}
    
     
 
