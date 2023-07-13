@@ -150,10 +150,10 @@ namespace Bank
             {
                 if (currentClient.Amount>=amount)
                 {
-                    currentCustomer.Amount -= amount;
+                    currentClient.Amount -= amount;
                     recipient.Amount += amount;
-                    UpdateCustomerFile(currentClient);
-                    UpdateCustomerFile(recipient);
+                    UpdateClientFile(currentClient);
+                    UpdateClientFile(recipient);
                     Console.WriteLine($" Current balance: {currentClient.Amount}");
                 }
                 else
@@ -172,7 +172,7 @@ namespace Bank
             string newPassword = Console.ReadLine();
 
             currentClient.Password = newPassword;
-           UpdateClientFile(currentClient)
+           UpdateClientFile(currentClient);
 
             Console.WriteLine("Password changed successfully.");
         }
