@@ -204,6 +204,34 @@ namespace Bank
                 }
             }
         }
+        static void UpdateClientFile(Client client)
+        {
+            string tempFile = Path.GetTempFileName();
+
+            using (StreamWriter writer = new StreamWriter(tempFile))
+            {
+                foreach (Client c in clients)
+                {
+                    if (c.ID == client.ID)
+                    {
+                        writer.WriteLine("{0},{1},{2},{3},{4},{5},{6}",
+                            c.ID, c.FirstName, c.LastName, c.Age, c.IBAN, c.Amount, client.Password);
+                    }
+                    else
+                    {
+                        writer.WriteLine("{0},{1},{2},{3},{4},{5},{6}",
+                            c.ID, c.FirstName, c.LastName, c.Age, c.IBAN, c.Amount, c.Password);
+                    }
+                }
+            }
+
+            File.Delete("clients.txt");
+            File.Move(tempFile, "clients.txt");
+        }
+
+        static Client FindClientByIBAN(string iban)
+        {
+            foreach (Client client in clients)
         }
 
    
