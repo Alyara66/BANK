@@ -130,7 +130,7 @@ namespace Bank
             if (currentClient.Amount >= amount)
             {
                 currentClient.Amount -= amount;
-              
+                UpdateClientFile(currentClient);
                 Console.WriteLine($"Current balance: {currentClient.Amount}");
             }
             else
