@@ -119,7 +119,7 @@ namespace Bank
             decimal amount = decimal.Parse(Console.ReadLine());
             currentClient.Amount += amount;
           
-            UpdateClientFile(currentClient);
+
             Console.WriteLine($"Your new balance is: {currentClient.Amount}");
         }
         static void WithdrawMoney()
@@ -130,7 +130,7 @@ namespace Bank
             if (currentClient.Amount >= amount)
             {
                 currentClient.Amount -= amount;
-                UpdateClientFile(currentClient);
+              
                 Console.WriteLine($"Current balance: {currentClient.Amount}");
             }
             else
@@ -144,16 +144,17 @@ namespace Bank
             string recipientIBAN = Console.ReadLine();
             Console.Write("Enter the amount to transfer: ");
             decimal amount = Convert.ToDecimal(Console.ReadLine());
-             Client recipient = FindClientByIBAN(recipientIBAN);
-              if (recipient != null)
+
+            Customer recipient= FindCustomerByIBAN(recipientIBAN);
+            if (recipient != null)
             {
-                if (currentClient.Amount >= amount)
+                if (currentCustomer.Amount>=amount)
                 {
-                    currentClient.Amount -= amount;
+                    currentCustomer.Amount -= amount;
                     recipient.Amount += amount;
-                    UpdateClientFile(currentClient);
-                    UpdateClientFile(recipient);
-                    Console.WriteLine($" Current balance: {currentClient.Amount}");
+                    UpdateCustomerFile(currentCustomer);
+                    UpdateCustomerFile(recipient);
+                    Console.WriteLine("Transfer succesful. Current balance: {0}", currentCustomer.Amount);
                 }
                 else
                 {
@@ -234,7 +235,6 @@ namespace Bank
 
    
     }
-
 
 
 
