@@ -118,7 +118,7 @@ namespace Bank
             Console.Write("Enter amount to deposit: ");
             decimal amount = decimal.Parse(Console.ReadLine());
             currentClient.Amount += amount;
-          
+            UpdateClientFile(currentClient);
 
             Console.WriteLine($"Your new balance is: {currentClient.Amount}");
         }
