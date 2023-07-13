@@ -151,12 +151,12 @@ namespace Bank
                 {
                    
                 }
-                
+                else
                 {
                     Console.WriteLine("Insufficient funds. Cannot transfer.");
                 }
             }
-          
+             else
             {
                 Console.WriteLine("Recipient with the specified IBAN not found.");
             }
@@ -167,7 +167,7 @@ namespace Bank
             string newPassword = Console.ReadLine();
 
             currentClient.Password = newPassword;
-           
+           UpdateClientFile(currentClient)
 
             Console.WriteLine("Password changed successfully.");
         }
